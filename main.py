@@ -1,13 +1,19 @@
+"""" 
+This program asks you for the csv file and the column for stock price data. Also 
+asks user to imput the invested value and then makes the animated graph of the investment 
+value. 
+
+"""
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.animation import FFMpegWriter
 
 # Load and process stock data
-def load_stock_data(csv_file):
+def load_stock_data(csv_file, price_column):
     df = pd.read_csv(csv_file, parse_dates=['Date'], dayfirst=False)
     df.sort_values('Date', inplace=True)  # Ensure chronological order
-    df['Close'] = df['Close/Last'].replace(r'[\$,]', '', regex=True).astype(float)  # Convert to float
+    df[price_column] = df[price_column].replace(r'[\$,]', '', regex=True).astype(float)  # Convert to float
     
     # Ensure there's data to process
     if df.empty:
@@ -16,8 +22,8 @@ def load_stock_data(csv_file):
     return df
 
 # Calculate investment value over time
-def calculate_values(df, initial_investment=1000):
-    df['Investment Value'] = (initial_investment / df.iloc[0]['Close']) * df['Close'] #calculating the number of share * daily price values
+def calculate_values(df, price_column, initial_investment):
+    df['Investment Value'] = (initial_investment / df.iloc[0][price_column]) * df[price_column]
     return df
 
 # Create and animate the stock growth graph
@@ -52,7 +58,7 @@ def animate_stock_growth(df, output_file="stock_growth.mp4"):
         ax.set_ylabel("Investment Value ($)")
         ax.legend()
 
-    ani = animation.FuncAnimation(fig, update, frames=len(df), interval=20, repeat=False)
+    ani = animation.FuncAnimation(fig, update, frames=len(df), interval=10, repeat=False)
 
     # Save animation
     writer = FFMpegWriter(fps=30, metadata={"title": "Stock Growth Animation"})
@@ -60,7 +66,10 @@ def animate_stock_growth(df, output_file="stock_growth.mp4"):
     plt.show()
 
 if __name__ == "__main__":
-    csv_file = "stocks.csv"  # Change to your actual CSV file
-    df = load_stock_data(csv_file)
-    df = calculate_values(df)
+    csv_file = input("Enter the CSV file name: ")
+    price_column = input("Enter the column name for stock price data: ")
+    initial_investment = float(input("Enter the initial investment amount: "))
+    
+    df = load_stock_data(csv_file, price_column)
+    df = calculate_values(df, price_column, initial_investment)
     animate_stock_growth(df)
