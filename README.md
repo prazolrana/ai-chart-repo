@@ -13,7 +13,8 @@ Features
 - Generate an animated line graph showing the investment growth.
 - Save the animation as an MP4 file
 
-
+**npstocks_chartai.py**
+same as main.py but for nepse stocks since the date format for those codes are different
 
 **Data Scraper for Stock Price History**
 
